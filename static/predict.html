@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> FCEE_2018 </title>
+	<style >
+	* {
+		font-size: 30px
+	}	
+	</style>
+</head>
+<body>
+	<input type="file" id="image_selector" >
+	<button id="predict_button">Predict</button>
+	<p style="font-weight: bold">Predictions</p>
+	<p>Tumor : <span id="tumor_prediction"></span></p>
+	<p>Normal : <span id="normal_prediction"></span></p>
+	<img id="selected_image" src=""/>
+
+
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script >
+		let base64Image;
+		$("#image_selector").change(function() {
+			console.log("tbadeeel");
+			let reader = new FileReader();
+			
+			reader.onload = function(e) {
+				console.log("loadeeet");
+				let dataURL = reader.result;
+				$('#selected_image').attr("src", dataURL);
+				base64Image = dataURL.replace("data:image/jpeg;base64,","");
+				console.log(base64Image);
+			}
+			reader.readAsDataURL($("#image_selector")[0].files[0]);
+			$("#tumor_prediction").text("");
+			$("#normal_prediction").text("");
+		});
+
+		$("#predict_button").click(function(event){
+			let message = {
+				image : base64Image
+			}
+			console.log(message);
+			$.post("http://127.0.0.1:5000/predict", JSON.stringify(message), function(response){
+					$("#tumor_prediction").text(response.prediction.tumor);
+
+					$("#normal_prediction").text(response.prediction.normal);
+
+					console.log(response);
+			});
+
+		});
+
+
+
+	</script>
+</body>
+</html>
